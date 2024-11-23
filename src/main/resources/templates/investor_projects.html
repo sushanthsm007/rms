@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Browse Projects - Investor</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    /* Styling for the project list and buttons */
+    .project-list {
+      list-style-type: none;
+      padding: 0;
+    }
+    .project-item {
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 10px 15px;
+      background-color: #4CAF50;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+
+    .btn:hover {
+      background-color: #45a049;
+    }
+
+    /* Rating stars section */
+    .rating-container {
+      margin-top: 10px;
+      text-align: left;
+    }
+
+    .rating-container label {
+      cursor: pointer;
+    }
+
+    .stars {
+      display: inline-flex;
+      gap: 0px; /* Remove the gap between the stars */
+      direction: rtl; /* Reverse the direction of stars */
+    }
+
+    .stars input {
+      display: none;
+    }
+
+    .stars label:before {
+      content: '★';
+      font-size: 24px;
+      color: gray;
+    }
+
+    .stars input:checked ~ label:before {
+      color: gold;
+    }
+
+    .stars label:hover ~ label:before {
+      color: gold;
+    }
+
+    .stars label:hover:before {
+      color: gold;
+    }
+
+    /* Center text class */
+    .center-text {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Browse Projects</h1>
+</header>
+<main>
+  <div class="content">
+    <h2 class="center-text">Available Projects</h2>
+    <ul class="project-list">
+      <li th:each="project : ${projects}" class="project-item">
+        <h3 th:text="${project.name}" class="center-text">Project Name</h3>
+        <p th:text="${project.description}" class="center-text">Project Description</p>
+
+        <!-- Rating Section -->
+        <div class="rating-container">
+          <h4>Rate it!</h4>
+          <div class="stars">
+            <!-- Dynamic ID using project.id -->
+            <input type="radio" th:id="'star1-' + ${project.id}" th:name="'rating-' + ${project.id}" value="1">
+            <label th:for="'star1-' + ${project.id}"></label>
+
+            <input type="radio" th:id="'star2-' + ${project.id}" th:name="'rating-' + ${project.id}" value="2">
+            <label th:for="'star2-' + ${project.id}"></label>
+
+            <input type="radio" th:id="'star3-' + ${project.id}" th:name="'rating-' + ${project.id}" value="3">
+            <label th:for="'star3-' + ${project.id}"></label>
+
+            <input type="radio" th:id="'star4-' + ${project.id}" th:name="'rating-' + ${project.id}" value="4">
+            <label th:for="'star4-' + ${project.id}"></label>
+
+            <input type="radio" th:id="'star5-' + ${project.id}" th:name="'rating-' + ${project.id}" value="5">
+            <label th:for="'star5-' + ${project.id}"></label>
+          </div>
+        </div>
+
+        <div class="btn-group">
+          <a th:href="@{/projects/view/{id}(id=${project.id})}" class="btn">View Details</a>
+          <form th:action="@{/projects/invest/{id}(id=${project.id})}" method="post">
+            <button type="submit" class="btn">Invest</button>
+          </form>
+        </div>
+      </li>
+    </ul>
+    <button class="btn" onclick="window.history.back()">Back to Projects</button>
+  </div>
+</main>
+</body>
+</html>

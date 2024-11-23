@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Investor Dashboard - Innovera RMS</title>
+  <link rel="stylesheet" type="text/css" href="/css/style.css">
+  <style>
+    .dashboard-container {
+      display: flex;
+      justify-content: space-between;
+      padding: 20px;
+    }
+    .content {
+      flex-grow: 1;
+    }
+    .sidebar {
+      width: 200px;
+    }
+    .calendar-container {
+      padding: 10px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 300px; /* Matches button width */
+      margin-left: 10px; /* Adjusted to move left */
+      background-color: transparent;
+    }
+    .calendar {
+      display: table;
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .calendar th, .calendar td {
+      padding: 8px;
+      text-align: center;
+      border: 1px solid #ddd;
+      width: 42px; /* Adjusted for consistent alignment */
+    }
+    .calendar th {
+      background-color: #4CAF50;
+      color: white;
+    }
+    .calendar td {
+      cursor: pointer;
+    }
+    .calendar td:hover {
+      background-color: #ddd;
+    }
+    .calendar-header {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .current-day {
+      background-color: #ffcc00;
+    }
+    .btn {
+      padding: 10px 15px;
+      background-color: #4CAF50;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+    .btn:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Investor Dashboard - Innovera RMS</h1>
+</header>
+<main>
+  <div class="dashboard-container">
+    <nav class="sidebar">
+      <ul>
+        <li><a href="/investor">Dashboard</a></li>
+        <li><a href="/investor/projects">Browse Projects</a></li>
+        <li><a href="/investor/investments">My Investments</a></li>
+        <li><a href="/investor/hackathons">Hackathons</a></li>
+        <li><a th:href="@{/profile/{id}(id=${user.id})}">Profile</a></li>
+        <li>
+          <form th:action="@{/logout}" method="post" style="display: inline;">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <button type="submit" style="background: none; border: none; color: inherit; cursor: pointer;">
+              Logout
+            </button>
+          </form>
+        </li>
+      </ul>
+    </nav>
+    <div class="content">
+      <div class="welcome-section">
+        <h1>Welcome to Innovera Solutions</h1>
+        <p>Use the sidebar to navigate the investor panel.</p>
+      </div>
+      <div class="cards">
+        <div class="card">
+          <h2>Browse Projects</h2>
+          <p>Discover innovative projects to invest in.</p>
+          <a href="/investor/projects" class="btn">Browse Projects</a>
+        </div>
+        <div class="card">
+          <h2>My Investments</h2>
+          <p>View and manage your investments.</p>
+          <a href="/investor/investments" class="btn">View Investments</a>
+        </div>
+        <div class="card">
+          <h2>Hackathons</h2>
+          <p>Explore hackathons and find potential investment opportunities.</p>
+          <a href="/investor/hackathons" class="btn">View Hackathons</a>
+        </div>
+        <div class="card">
+          <h2>Profile</h2>
+          <p>Update your profile information and change your password.</p>
+          <a th:href="@{/profile/{id}(id=${user.id})}" class="btn">Update Profile</a>
+        </div>
+      </div>
+    </div>
+    <div class="calendar-container">
+      <div class="calendar-header">
+        <span id="monthYear"></span>
+      </div>
+      <div class="calendar-nav">
+        <button id="prevMonth">&lt;</button>
+        <button id="nextMonth">&gt;</button>
+      </div>
+      <table class="calendar">
+        <thead>
+        <tr>
+          <th>Sun</th>
+          <th>Mon</th>
+          <th>Tue</th>
+          <th>Wed</th>
+          <th>Thu</th>
+          <th>Fri</th>
+          <th>Sat</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+<script>
+  const monthYear = document.getElementById('monthYear');
+  const prevMonthButton = document.getElementById('prevMonth');
+  const nextMonthButton = document.getElementById('nextMonth');
+  const calendarBody = document.querySelector('.calendar tbody');
+  let currentDate = new Date();
+
+  function renderCalendar(date) {
+    const month = date.getMonth();
+    const year = date.getFullYear();
+    monthYear.textContent = `${date.toLocaleString('default', { month: 'long' })} ${year}`;
+    calendarBody.innerHTML = '';
+    const firstDay = new Date(year, month, 1);
+    const lastDate = new Date(year, month + 1, 0);
+    const lastDay = lastDate.getDay();
+    const daysInMonth = lastDate.getDate();
+    let days = [];
+    for (let i = 0; i < firstDay.getDay(); i++) {
+      days.push('');
+    }
+    for (let i = 1; i <= daysInMonth; i++) {
+      days.push(i);
+    }
+    for (let i = days.length; i < 42; i++) {
+      days.push('');
+    }
+    let row = [];
+    for (let i = 0; i < days.length; i++) {
+      if (i % 7 === 0 && i !== 0) {
+        calendarBody.appendChild(createRow(row));
+        row = [];
+      }
+      row.push(days[i]);
+    }
+    if (row.length) {
+      calendarBody.appendChild(createRow(row));
+    }
+  }
+
+  function createRow(days) {
+    const tr = document.createElement('tr');
+    days.forEach(day => {
+      const td = document.createElement('td');
+      td.textContent = day;
+      if (day === new Date().getDate() && currentDate.getMonth() === new Date().getMonth() && currentDate.getFullYear() === new Date().getFullYear()) {
+        td.classList.add('current-day');
+      }
+      tr.appendChild(td);
+    });
+    return tr;
+  }
+
+  prevMonthButton.addEventListener('click', () => {
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    renderCalendar(currentDate);
+  });
+
+  nextMonthButton.addEventListener('click', () => {
+    currentDate.setMonth(currentDate.getMonth() + 1);
+    renderCalendar(currentDate);
+  });
+
+  renderCalendar(currentDate);
+</script>
+</body>
+</html>
